@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from datetime import UTC, datetime
 from ipaddress import IPv4Address
 from math import isfinite
 from typing import Protocol
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from netsentinel.application.control import CancellationToken
+from netsentinel.application.events import ProgressEvent
 from netsentinel.application.policies import SafetyPolicy
 from netsentinel.domain.enums import OperationType
 from netsentinel.domain.errors import (
@@ -69,6 +70,8 @@ class DiscoveryService:
         authorization: AuthorizationRecord | None,
         interface: str | None = None,
         cancellation: CancellationToken | None = None,
+        job_id: UUID | None = None,
+        progress: Callable[[ProgressEvent], None] | None = None,
     ) -> tuple[DeviceAsset, ...]:
         """Run discovery only after policy and authorization validation."""
         self._policy.validate_authorization(
@@ -80,28 +83,49 @@ class DiscoveryService:
             raise PolicyViolation("An explicit authorization is required")
 
         token = cancellation or CancellationToken()
+        operation_job_id = job_id or uuid4()
+        host_count = len(scope.hosts(limit=self._policy.limits.max_scope_hosts))
         self._record_audit(
             authorization,
             action="discovery.started",
             details=(
-                ("target_count", str(len(scope.hosts()))),
+                ("target_count", str(host_count)),
                 ("interface", interface or "default"),
             ),
         )
         try:
             token.raise_if_cancelled()
-            records = tuple(
-                normalize_discovery_record(record, scope)
-                for record in self._adapter.discover(
-                    scope,
-                    interface=interface,
-                    cancellation=token,
+            if progress is not None:
+                progress(
+                    ProgressEvent(
+                        job_id=operation_job_id,
+                        completed=0,
+                        total=host_count,
+                        message="Network discovery started",
+                    )
                 )
-            )
+            records_list: list[DiscoveryRecord] = []
+            for record in self._adapter.discover(
+                scope,
+                interface=interface,
+                cancellation=token,
+            ):
+                token.raise_if_cancelled()
+                records_list.append(normalize_discovery_record(record, scope))
+            records = tuple(records_list)
             token.raise_if_cancelled()
             assets = tuple(
                 _asset_from_record(record) for record in _merge_records(records)
             )
+            if progress is not None:
+                progress(
+                    ProgressEvent(
+                        job_id=operation_job_id,
+                        completed=host_count,
+                        total=host_count,
+                        message="Network discovery completed",
+                    )
+                )
             if self._repository is not None:
                 for asset in assets:
                     self._repository.save_asset(asset)

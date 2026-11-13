@@ -7,11 +7,12 @@ Scapy/Npcap discovery, optional Nmap service detection, and evidence-based
 reporting.
 
 > **Development status:** NetSentinel currently provides its project shell,
-> domain safety layer, SQLite persistence, an authorized discovery service, a
-> bounded TCP Connect scan service, and a reusable Qt worker layer. Scapy/Npcap
-> and socket adapters are implemented as library components, but discovery and scan controls are not
-> yet wired into the desktop UI. The current build does **not** run Nmap,
-> capture packets, or claim to implement any security assessment.
+> domain safety layer, SQLite persistence, authorized discovery and bounded TCP
+> Connect services, reusable Qt workers, and desktop controls for those two
+> operations. The controls require a normalized local scope, operator identity,
+> reason, explicit confirmation, and a second confirmation dialog before work is
+> queued. The current build does **not** run Nmap from the UI, capture packets
+> outside the discovery adapter, or claim to implement any security assessment.
 
 ## Project goals
 
@@ -119,10 +120,12 @@ Start the current application shell:
 python -m netsentinel
 ```
 
-The discovery and TCP adapters are available to application code only after
-the authorization and safety-policy checks. The desktop controls for discovery,
-scanning, and all other active modules are intentionally withheld until their
-respective integration, dependency, and test stages are complete.
+The desktop currently exposes authorized Network Discovery and TCP Port Scanner
+controls. Each operation validates the scope and resource limits, records the
+operator authorization in SQLite, and runs through a background worker with
+progress and cooperative cancellation. Discovery still requires Scapy/Npcap on
+Windows; the default test suite uses fake adapters and does not generate traffic.
+Nmap service detection and all other active modules remain library-only or planned.
 
 ## Development checks
 

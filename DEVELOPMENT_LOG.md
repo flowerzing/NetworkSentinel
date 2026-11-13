@@ -45,11 +45,20 @@ reconstructed from memory; their authoritative timestamps remain in Git history.
   no Nmap process start after cancellation.
 - Added reusable Qt workers and a manager for queued execution, progress, errors,
   cancellation, duplicate-job rejection, and lifecycle cleanup.
-- Verification: `pytest` — 52 passed; `ruff check .` — passed; `mypy src` — passed.
+- Wired authorized Discovery and TCP Port Scanner panels into the desktop window.
+- Added normalized target/port forms, explicit confirmation dialogs, persisted
+  authorization records, progress display, cooperative cancellation, and worker
+  error status handling.
+- Added GUI tests using a fake discovery adapter; the test suite generates no
+  network traffic.
+- Verification before this UI stage: `pytest` — 52 passed; `ruff check .` — passed;
+  `mypy src` — passed.
+- Verification after this UI stage: `pytest` — 55 passed; `ruff check .` — passed;
+  `mypy src` — passed.
 
 ## Next work
 
-- Wire authorized discovery and scan controls into the desktop UI.
-- Add the first end-to-end GUI test for an authorized background operation.
-- Keep desktop controls disabled until the corresponding integration tests and
-  authorization flow are complete.
+- Add Network Monitor using Windows-compatible interface statistics.
+- Add Device Inventory browsing with CSV and JSON export.
+- Keep Nmap service detection, assessment, and reporting honest about their
+  library-only or planned status until their UI and tests are complete.

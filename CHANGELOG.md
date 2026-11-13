@@ -34,8 +34,12 @@ when a stage is completed and verified.
   cancellation, process timeouts, output bounds, and no shell execution.
 - Reusable PySide6 workers and a worker manager with queued execution,
   cancellation, progress, result, error, and lifecycle signals.
+- Desktop Network Discovery and TCP Port Scanner panels with validated forms,
+  explicit authorization confirmation, progress, cancellation, and actionable
+  worker status messages.
+- GUI tests covering active panel construction, authorization gating, and a fake
+  discovery operation executed through the worker manager.
 
 ### Not yet implemented
 
-- Discovery and port-scan controls wired into the desktop UI.
 - Network monitoring, inventory, assessments, and reports.
