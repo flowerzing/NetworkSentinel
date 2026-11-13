@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from ipaddress import IPv4Address, IPv4Network
 from uuid import UUID, uuid4
@@ -182,6 +182,22 @@ class PortObservation:
     service: str | None = None
     version: str | None = None
     source: EvidenceSource = EvidenceSource.SOCKET
+    observation_id: UUID = field(default_factory=uuid4)
+    observed_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+
+
+@dataclass(frozen=True, slots=True)
+class DeviceAsset:
+    """A persistent inventory record for one discovered IPv4 device."""
+
+    asset_id: UUID
+    address: IPv4Address
+    first_seen: datetime
+    last_seen: datetime
+    mac_address: str | None = None
+    hostname: str | None = None
+    vendor: str | None = None
+    status: str = "unknown"
 
 
 @dataclass(frozen=True, slots=True)

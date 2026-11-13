@@ -21,8 +21,10 @@ def test_configuration_uses_environment_overrides(
 ) -> None:
     data_path = tmp_path / "runtime"
     report_path = tmp_path / "reports"
+    database_path = tmp_path / "state" / "netsentinel.sqlite3"
     monkeypatch.setenv("NETSENTINEL_DATA_DIR", str(data_path))
     monkeypatch.setenv("NETSENTINEL_REPORT_DIR", str(report_path))
+    monkeypatch.setenv("NETSENTINEL_DATABASE_PATH", str(database_path))
     monkeypatch.setenv("NETSENTINEL_NMAP_PATH", "C:/Program Files/Nmap/nmap.exe")
     monkeypatch.setenv("NETSENTINEL_LOG_LEVEL", "debug")
 
@@ -30,6 +32,7 @@ def test_configuration_uses_environment_overrides(
 
     assert config.data_directory == data_path
     assert config.report_directory == report_path
+    assert config.database_path == database_path
     assert config.nmap_path == "C:/Program Files/Nmap/nmap.exe"
     assert config.log_level == "DEBUG"
 

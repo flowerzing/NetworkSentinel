@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import argparse
+import sqlite3
 import sys
 from collections.abc import Sequence
 
 from netsentinel import __version__
 from netsentinel.infrastructure.config import AppConfig
+from netsentinel.infrastructure.database import SQLiteDatabase
 from netsentinel.infrastructure.logging_setup import configure_logging
 
 
@@ -41,6 +43,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
 
     try:
+        SQLiteDatabase(config.database_path).initialize()
+    except (OSError, RuntimeError, sqlite3.Error) as exc:
+        print(f"Unable to initialize the NetSentinel database: {exc}", file=sys.stderr)
+        return 1
+
+    try:
         from PySide6.QtWidgets import QApplication
     except ImportError as exc:
         print(
@@ -53,7 +61,9 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     from netsentinel.ui.main_window import MainWindow
 
-    application = QApplication(list(argv) if argv is not None else sys.argv)
+    application = QApplication.instance()
+    if application is None:
+        application = QApplication(list(argv) if argv is not None else sys.argv)
     application.setApplicationName("NetSentinel")
     application.setApplicationVersion(__version__)
     window = MainWindow(config)

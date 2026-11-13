@@ -13,6 +13,7 @@ class AppConfig:
 
     data_directory: Path
     report_directory: Path
+    database_path: Path
     nmap_path: str | None
     log_level: str
     max_scope_hosts: int = 256
@@ -31,6 +32,11 @@ class AppConfig:
         report_directory = Path(
             os.environ.get("NETSENTINEL_REPORT_DIR", data_directory / "reports")
         ).expanduser()
+        database_path = Path(
+            os.environ.get(
+                "NETSENTINEL_DATABASE_PATH", data_directory / "netsentinel.sqlite3"
+            )
+        ).expanduser()
         nmap_path = os.environ.get("NETSENTINEL_NMAP_PATH") or None
         log_level = os.environ.get("NETSENTINEL_LOG_LEVEL", "INFO").upper()
         if log_level not in {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}:
@@ -38,6 +44,7 @@ class AppConfig:
         return cls(
             data_directory=data_directory,
             report_directory=report_directory,
+            database_path=database_path,
             nmap_path=nmap_path,
             log_level=log_level,
         )
@@ -50,6 +57,7 @@ class AppConfig:
                 "NetSentinel configuration is valid.",
                 f"data_directory={self.data_directory}",
                 f"report_directory={self.report_directory}",
+                f"database_path={self.database_path}",
                 f"nmap_path={nmap}",
                 f"log_level={self.log_level}",
                 f"max_scope_hosts={self.max_scope_hosts}",

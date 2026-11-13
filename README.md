@@ -6,10 +6,11 @@ modular Python portfolio project with a PySide6 interface, SQLite persistence,
 Scapy/Npcap discovery, optional Nmap service detection, and evidence-based
 reporting.
 
-> **Development status:** NetSentinel is currently at the architecture and
-> bootstrap stage. The current build starts a small Qt application shell and
-> validates local configuration. It does **not** scan networks, capture
-> packets, inspect ports, or claim to implement any security assessment yet.
+> **Development status:** NetSentinel currently provides its project shell,
+> domain safety layer, and SQLite persistence. The current build starts a small
+> Qt application shell and validates local configuration. It does **not** scan
+> networks, capture packets, inspect ports, or claim to implement any security
+> assessment yet.
 
 ## Project goals
 
@@ -136,8 +137,8 @@ integration tests will be explicitly marked and opt-in.
 
 ## Configuration
 
-Runtime configuration will be read from a typed configuration object and
-validated before a job starts. Planned settings include:
+Runtime configuration is read from a typed configuration object and
+validated before a job starts. The current bootstrap supports these settings:
 
 - SQLite database location and report output directory.
 - Nmap executable path.
@@ -145,6 +146,7 @@ validated before a job starts. Planned settings include:
 - Timeout, retry, rate, concurrency, and maximum scope limits.
 - Logging level and retention settings.
 
+The database path can be overridden with `NETSENTINEL_DATABASE_PATH`.
 Credentials and secrets will not be stored in the project configuration.
 
 ## Responsible use

@@ -18,6 +18,10 @@ when a stage is completed and verified.
 - Explicit authorization and conservative local-only safety policies.
 - Cooperative cancellation and reusable operation rate limiting.
 - Unit tests for the dependency-free domain and safety layer.
+- Versioned SQLite migrations with WAL, foreign keys, busy timeout, and indexes.
+- Parameterized repositories for authorizations, jobs, assets, observations,
+  findings, and audit events.
+- A configurable SQLite database path under the application data directory.
 
 ### Not yet implemented
 
