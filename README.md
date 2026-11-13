@@ -7,9 +7,9 @@ Scapy/Npcap discovery, optional Nmap service detection, and evidence-based
 reporting.
 
 > **Development status:** NetSentinel currently provides its project shell,
-> domain safety layer, SQLite persistence, an authorized discovery service, and
-> a bounded TCP Connect scan service. Scapy/Npcap and socket adapters are
-> implemented as library components, but discovery and scan controls are not
+> domain safety layer, SQLite persistence, an authorized discovery service, a
+> bounded TCP Connect scan service, and a reusable Qt worker layer. Scapy/Npcap
+> and socket adapters are implemented as library components, but discovery and scan controls are not
 > yet wired into the desktop UI. The current build does **not** run Nmap,
 > capture packets, or claim to implement any security assessment.
 

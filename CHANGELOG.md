@@ -32,6 +32,8 @@ when a stage is completed and verified.
   limits.
 - Optional Nmap service/version detection with fixed arguments, XML parsing,
   cancellation, process timeouts, output bounds, and no shell execution.
+- Reusable PySide6 workers and a worker manager with queued execution,
+  cancellation, progress, result, error, and lifecycle signals.
 
 ### Not yet implemented
 

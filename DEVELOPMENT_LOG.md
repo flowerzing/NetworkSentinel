@@ -43,11 +43,13 @@ reconstructed from memory; their authoritative timestamps remain in Git history.
   timeouts.
 - Added fake-process and controlled-XML tests that verify no shell execution and
   no Nmap process start after cancellation.
-- Verification: `pytest` — 46 passed; `ruff check .` — passed; `mypy src` — passed.
+- Added reusable Qt workers and a manager for queued execution, progress, errors,
+  cancellation, duplicate-job rejection, and lifecycle cleanup.
+- Verification: `pytest` — 52 passed; `ruff check .` — passed; `mypy src` — passed.
 
 ## Next work
 
-- Add the first background worker integration for discovery and port scanning.
 - Wire authorized discovery and scan controls into the desktop UI.
+- Add the first end-to-end GUI test for an authorized background operation.
 - Keep desktop controls disabled until the corresponding integration tests and
   authorization flow are complete.
