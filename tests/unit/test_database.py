@@ -47,7 +47,7 @@ def test_migrations_are_idempotent(tmp_path) -> None:
             ).fetchall()
         }
 
-    assert version == 1
+    assert version == 2
     assert {"authorization_records", "assets", "audit_events"} <= tables
     assert repository is not None
 
@@ -83,6 +83,7 @@ def test_asset_upsert_preserves_known_fields_and_supports_search(tmp_path) -> No
             mac_address="AA:BB:CC:DD:EE:FF",
             hostname="lab-device",
             vendor="Example Vendor",
+            response_time_ms=3.5,
             status="active",
         )
     )
@@ -100,6 +101,7 @@ def test_asset_upsert_preserves_known_fields_and_supports_search(tmp_path) -> No
     assert len(assets) == 1
     assert assets[0].asset_id == asset_id
     assert assets[0].mac_address == "AA:BB:CC:DD:EE:FF"
+    assert assets[0].response_time_ms == 3.5
     assert assets[0].last_seen == last_seen
     assert assets[0].status == "inactive"
 

@@ -7,10 +7,11 @@ Scapy/Npcap discovery, optional Nmap service detection, and evidence-based
 reporting.
 
 > **Development status:** NetSentinel currently provides its project shell,
-> domain safety layer, and SQLite persistence. The current build starts a small
-> Qt application shell and validates local configuration. It does **not** scan
-> networks, capture packets, inspect ports, or claim to implement any security
-> assessment yet.
+> domain safety layer, SQLite persistence, and the first authorized discovery
+> service. Scapy/Npcap capability diagnostics and a bounded ARP adapter are
+> implemented as library components, but discovery controls are not yet wired
+> into the desktop UI. The current build does **not** inspect ports, capture
+> packets, or claim to implement any security assessment.
 
 ## Project goals
 
@@ -118,8 +119,10 @@ Start the current application shell:
 python -m netsentinel
 ```
 
-The scanner modules are intentionally not available until their respective
-implementation stages, dependencies, policies, and tests are complete.
+The discovery adapter is available to application code only after the
+authorization and safety-policy checks. The desktop controls for discovery and
+all other scanner modules are intentionally withheld until their respective
+integration, dependency, and test stages are complete.
 
 ## Development checks
 

@@ -122,12 +122,15 @@ class SQLiteRepository:
                 """
                 INSERT INTO assets
                     (asset_id, ip_address, mac_address, hostname, vendor,
-                     first_seen, last_seen, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                     response_time_ms, first_seen, last_seen, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(ip_address) DO UPDATE SET
                     mac_address = COALESCE(excluded.mac_address, assets.mac_address),
                     hostname = COALESCE(excluded.hostname, assets.hostname),
                     vendor = COALESCE(excluded.vendor, assets.vendor),
+                    response_time_ms = COALESCE(
+                        excluded.response_time_ms, assets.response_time_ms
+                    ),
                     last_seen = excluded.last_seen,
                     status = excluded.status
                 """,
@@ -137,6 +140,7 @@ class SQLiteRepository:
                     asset.mac_address,
                     asset.hostname,
                     asset.vendor,
+                    asset.response_time_ms,
                     _datetime_text(asset.first_seen),
                     _datetime_text(asset.last_seen),
                     asset.status,
@@ -326,6 +330,7 @@ def _asset_from_row(row: Any) -> DeviceAsset:
         mac_address=row["mac_address"],
         hostname=row["hostname"],
         vendor=row["vendor"],
+        response_time_ms=row["response_time_ms"],
         status=row["status"],
     )
 

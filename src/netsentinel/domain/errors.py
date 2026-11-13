@@ -19,3 +19,7 @@ class PolicyViolation(NetSentinelError):
 
 class OperationCancelled(NetSentinelError):
     """Raised when a worker reaches a cooperative cancellation checkpoint."""
+
+
+class CapabilityError(NetSentinelError):
+    """Raised when an optional operating-system capability is unavailable."""

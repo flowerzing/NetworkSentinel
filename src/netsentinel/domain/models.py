@@ -187,6 +187,20 @@ class PortObservation:
 
 
 @dataclass(frozen=True, slots=True)
+class DiscoveryRecord:
+    """Normalized evidence returned by a network discovery adapter."""
+
+    address: IPv4Address
+    mac_address: str | None = None
+    hostname: str | None = None
+    vendor: str | None = None
+    response_time_ms: float | None = None
+    status: str = "active"
+    source: EvidenceSource = EvidenceSource.SCAPY
+    observed_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+
+
+@dataclass(frozen=True, slots=True)
 class DeviceAsset:
     """A persistent inventory record for one discovered IPv4 device."""
 
@@ -197,6 +211,7 @@ class DeviceAsset:
     mac_address: str | None = None
     hostname: str | None = None
     vendor: str | None = None
+    response_time_ms: float | None = None
     status: str = "unknown"
 
 

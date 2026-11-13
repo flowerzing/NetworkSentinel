@@ -22,9 +22,13 @@ when a stage is completed and verified.
 - Parameterized repositories for authorizations, jobs, assets, observations,
   findings, and audit events.
 - A configurable SQLite database path under the application data directory.
+- An authorized discovery service with adapter contracts, normalization, deduplication,
+  persistence orchestration, and audit events.
+- Scapy/Npcap capability diagnostics and a bounded local ARP adapter.
+- Optional discovery response-time persistence for inventory records.
 
 ### Not yet implemented
 
-- Authorized network discovery.
+- Discovery controls wired into the desktop UI.
 - TCP port scanning and Nmap service detection.
 - Network monitoring, inventory, assessments, and reports.

@@ -86,6 +86,12 @@ _MIGRATIONS: tuple[tuple[int, str], ...] = (
             ON audit_events(occurred_at);
         """,
     ),
+    (
+        2,
+        """
+        ALTER TABLE assets ADD COLUMN response_time_ms REAL;
+        """,
+    ),
 )
 
 
