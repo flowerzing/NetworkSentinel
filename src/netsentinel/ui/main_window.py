@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import cast
 from uuid import UUID, uuid4
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import (
     QFrame,
@@ -27,6 +27,7 @@ from PySide6.QtWidgets import (
 from netsentinel.application.authorization import AuthorizationService
 from netsentinel.application.discovery import DiscoveryService
 from netsentinel.application.events import JobErrorEvent, ProgressEvent
+from netsentinel.application.monitoring import NetworkMonitorService
 from netsentinel.application.policies import SafetyLimits, SafetyPolicy
 from netsentinel.application.port_scanning import PortScanService
 from netsentinel.domain.enums import OperationType
@@ -36,8 +37,10 @@ from netsentinel.domain.validation import parse_ports, parse_scope
 from netsentinel.infrastructure.config import AppConfig
 from netsentinel.infrastructure.database.connection import SQLiteDatabase
 from netsentinel.infrastructure.database.repositories import SQLiteRepository
+from netsentinel.infrastructure.monitoring.psutil_monitor import PsutilMonitorProvider
 from netsentinel.infrastructure.scanning.scapy_discovery import ScapyDiscoveryAdapter
 from netsentinel.infrastructure.scanning.tcp_scanner import TcpConnectScanner
+from netsentinel.ui.monitor_panel import MonitorPanel
 from netsentinel.ui.scan_panel import ScanFormData, ScanPanel
 from netsentinel.ui.workers import Worker, WorkerManager
 
@@ -84,6 +87,9 @@ class MainWindow(QMainWindow):
             TcpConnectScanner(),
             self._repository,
         )
+        self._monitor_service = NetworkMonitorService(PsutilMonitorProvider())
+        self._monitor_timer = QTimer(self)
+        self._monitor_timer.timeout.connect(self._refresh_monitor)
         self.setWindowTitle("NetSentinel")
         self.resize(1120, 720)
         self.setMinimumSize(920, 600)
@@ -142,6 +148,13 @@ class MainWindow(QMainWindow):
                 )
                 self._port_scan_panel = panel
                 page = panel
+            elif name == "Network Monitor":
+                monitor_panel = MonitorPanel()
+                monitor_panel.start_requested.connect(self._start_monitoring)
+                monitor_panel.stop_requested.connect(self._stop_monitoring)
+                monitor_panel.refresh_requested.connect(self._refresh_monitor)
+                self._monitor_panel = monitor_panel
+                page = monitor_panel
             else:
                 page = self._placeholder_page(name)
             content.addWidget(page)
@@ -189,6 +202,28 @@ class MainWindow(QMainWindow):
             payload,
             OperationType.PORT_SCAN,
         )
+
+    def _start_monitoring(self, interval_ms: int) -> None:
+        """Start periodic local telemetry refreshes without network probes."""
+        self._monitor_timer.start(interval_ms)
+        self._monitor_panel.set_monitoring(True)
+        self._monitor_panel.set_status("Monitoring started.")
+        self._refresh_monitor()
+
+    def _stop_monitoring(self) -> None:
+        """Stop periodic telemetry refreshes and keep the last snapshot visible."""
+        self._monitor_timer.stop()
+        self._monitor_panel.set_monitoring(False)
+        self._monitor_panel.set_status("Monitoring stopped. Last sample retained.")
+
+    def _refresh_monitor(self) -> None:
+        """Read one local telemetry snapshot on the GUI timer boundary."""
+        try:
+            snapshot = self._monitor_service.refresh()
+        except Exception as exc:
+            self._monitor_panel.set_status(f"Monitoring unavailable: {exc}")
+            return
+        self._monitor_panel.set_snapshot(snapshot)
 
     def _start_operation(
         self,
@@ -378,6 +413,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event: QCloseEvent) -> None:
         """Request cooperative cancellation before the application closes."""
+        self._monitor_timer.stop()
         for job_id in self._worker_manager.active_job_ids:
             self._worker_manager.cancel(job_id)
         event.accept()

@@ -8,11 +8,12 @@ reporting.
 
 > **Development status:** NetSentinel currently provides its project shell,
 > domain safety layer, SQLite persistence, authorized discovery and bounded TCP
-> Connect services, reusable Qt workers, and desktop controls for those two
-> operations. The controls require a normalized local scope, operator identity,
-> reason, explicit confirmation, and a second confirmation dialog before work is
-> queued. The current build does **not** run Nmap from the UI, capture packets
-> outside the discovery adapter, or claim to implement any security assessment.
+> Connect services, reusable Qt workers, desktop controls for those two
+> operations, and a read-only local Network Monitor backed by psutil. The scan
+> controls require a normalized local scope, operator identity, reason, explicit
+> confirmation, and a second confirmation dialog before work is queued. The
+> current build does **not** run Nmap from the UI or claim to implement any
+> security assessment.
 
 ## Project goals
 
@@ -121,11 +122,13 @@ python -m netsentinel
 ```
 
 The desktop currently exposes authorized Network Discovery and TCP Port Scanner
-controls. Each operation validates the scope and resource limits, records the
-operator authorization in SQLite, and runs through a background worker with
-progress and cooperative cancellation. Discovery still requires Scapy/Npcap on
-Windows; the default test suite uses fake adapters and does not generate traffic.
-Nmap service detection and all other active modules remain library-only or planned.
+controls plus a read-only Network Monitor. Scan operations validate the scope and
+resource limits, record operator authorization in SQLite, and run through a
+background worker with progress and cooperative cancellation. The monitor reads
+local interface counters through psutil on a configurable timer and does not
+send network probes. Discovery still requires Scapy/Npcap on Windows; the
+default test suite uses fake adapters and does not generate traffic. Nmap service
+detection and the remaining audit modules remain library-only or planned.
 
 ## Development checks
 

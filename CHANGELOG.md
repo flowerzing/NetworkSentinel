@@ -39,7 +39,12 @@ when a stage is completed and verified.
   worker status messages.
 - GUI tests covering active panel construction, authorization gating, and a fake
   discovery operation executed through the worker manager.
+- A read-only psutil Network Monitor with interface metadata, cumulative
+  counters, calculated byte rates, configurable timer refreshes, and a Qt table.
+- Monitoring tests using fake providers and a rendered Qt snapshot without real
+  network traffic.
 
 ### Not yet implemented
 
-- Network monitoring, inventory, assessments, and reports.
+- Device inventory UI and exports, assessments, reports, and dashboard views.
+- Live monitoring charts and Windows/Npcap/Nmap opt-in integration validation.

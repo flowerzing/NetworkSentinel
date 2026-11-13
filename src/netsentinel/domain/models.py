@@ -216,6 +216,59 @@ class DeviceAsset:
 
 
 @dataclass(frozen=True, slots=True)
+class InterfaceInfo:
+    """Normalized local network interface metadata."""
+
+    name: str
+    ipv4_addresses: tuple[IPv4Address, ...] = ()
+    is_up: bool = False
+    speed_mbps: float | None = None
+    mtu: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class TrafficCounters:
+    """Cumulative operating-system counters for one interface."""
+
+    interface_name: str
+    bytes_sent: int
+    bytes_received: int
+    packets_sent: int
+    packets_received: int
+    errors_in: int = 0
+    errors_out: int = 0
+    drops_in: int = 0
+    drops_out: int = 0
+
+
+@dataclass(frozen=True, slots=True)
+class TrafficSample:
+    """One normalized traffic sample and calculated byte rates."""
+
+    interface_name: str
+    sampled_at: datetime
+    bytes_sent: int
+    bytes_received: int
+    packets_sent: int
+    packets_received: int
+    send_rate_bytes_per_second: float
+    receive_rate_bytes_per_second: float
+    errors_in: int = 0
+    errors_out: int = 0
+    drops_in: int = 0
+    drops_out: int = 0
+
+
+@dataclass(frozen=True, slots=True)
+class MonitorSnapshot:
+    """Immutable local monitor state suitable for presentation."""
+
+    sampled_at: datetime
+    interfaces: tuple[InterfaceInfo, ...]
+    traffic: tuple[TrafficSample, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class AssessmentFinding:
     """A finding that must remain linked to concrete evidence."""
 

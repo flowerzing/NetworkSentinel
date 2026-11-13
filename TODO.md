@@ -10,8 +10,8 @@
 
 ## Next stage
 
-- [ ] Add Network Monitor using Windows-compatible interface statistics.
 - [ ] Add Device Inventory browsing with CSV and JSON export.
+- [ ] Add a dashboard summary using verified persisted results.
 
 ## Completed in the current stage
 
@@ -33,13 +33,15 @@
 - [x] Wire authorized Discovery and TCP Port Scanner controls into the desktop UI.
 - [x] Require explicit scope confirmation and persist UI-created authorizations.
 - [x] Add GUI tests for panel construction, authorization gating, and fake discovery workers.
+- [x] Add psutil-based local Network Monitor with timer controls and rate calculation.
+- [x] Add monitoring tests with fake providers and a rendered Qt snapshot.
 
 ## Planned modules
 
 - [x] Network Discovery with Scapy and Npcap capability diagnostics.
 - [x] TCP Connect port scanner with bounded concurrency and progress reporting.
 - [x] Optional Nmap service/version adapter using a safe subprocess boundary.
-- [ ] Network Monitor using Windows-compatible interface statistics.
+- [x] Network Monitor using Windows-compatible interface statistics.
 - [ ] Device Inventory with CSV and JSON export.
 - [ ] Evidence-based Security Assessment.
 - [ ] JSON, CSV, and PDF reports.
@@ -48,8 +50,9 @@
 
 ## Known limitations
 
-- The desktop currently starts only the authorized Discovery and TCP Connect
-  operations. Discovery requires Scapy/Npcap and suitable Windows permissions.
+- The desktop starts authorized Discovery and TCP Connect operations plus a
+  read-only local monitor. Discovery requires Scapy/Npcap and suitable Windows
+  permissions; the monitor currently presents a table and not a live chart.
 - The default test suite uses fake adapters and generates no network traffic.
 - Nmap service detection is implemented as an optional library adapter but is not
   wired into the desktop UI yet.

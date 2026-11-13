@@ -56,9 +56,18 @@ reconstructed from memory; their authoritative timestamps remain in Git history.
 - Verification after this UI stage: `pytest` — 55 passed; `ruff check .` — passed;
   `mypy src` — passed.
 
+- Implemented a read-only Network Monitor using psutil interface metadata and
+  cumulative counters.
+- Added normalized traffic samples, elapsed-time byte-rate calculation, counter
+  reset handling, configurable QTimer refreshes, and a Qt table view.
+- Added fake-provider and Qt rendering tests; the suite still generates no network
+  traffic.
+- Verification after this monitor stage: `pytest` — 60 passed; `ruff check .` —
+  passed; `mypy src` — passed.
+
 ## Next work
 
-- Add Network Monitor using Windows-compatible interface statistics.
 - Add Device Inventory browsing with CSV and JSON export.
+- Add a dashboard summary using verified persisted results.
 - Keep Nmap service detection, assessment, and reporting honest about their
   library-only or planned status until their UI and tests are complete.
