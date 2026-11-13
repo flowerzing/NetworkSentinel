@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from netsentinel.infrastructure.config import AppConfig
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QFrame,
@@ -18,6 +17,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from netsentinel.infrastructure.config import AppConfig
 
 _NAVIGATION = (
     "Dashboard",
@@ -50,14 +50,17 @@ class MainWindow(QMainWindow):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        sidebar = QFrame(objectName="sidebar")
+        sidebar = QFrame()
+        sidebar.setObjectName("sidebar")
         sidebar.setFixedWidth(240)
         sidebar_layout = QVBoxLayout(sidebar)
         sidebar_layout.setContentsMargins(20, 24, 20, 20)
         sidebar_layout.setSpacing(12)
 
-        brand = QLabel("NETSENTINEL", objectName="brand")
-        subtitle = QLabel("Defensive network visibility", objectName="subtitle")
+        brand = QLabel("NETSENTINEL")
+        brand.setObjectName("brand")
+        subtitle = QLabel("Defensive network visibility")
+        subtitle.setObjectName("subtitle")
         subtitle.setWordWrap(True)
         sidebar_layout.addWidget(brand)
         sidebar_layout.addWidget(subtitle)
@@ -94,9 +97,9 @@ class MainWindow(QMainWindow):
         heading.setStyleSheet("font-size: 28px; font-weight: 700; color: #e0f2fe;")
         status = QLabel(
             "The application foundation is ready. "
-            "This module will be delivered in a subsequent implementation stage.",
-            objectName="status",
+            "This module will be delivered in a subsequent implementation stage."
         )
+        status.setObjectName("status")
         status.setWordWrap(True)
         status.setMaximumWidth(720)
         layout.addWidget(heading)

@@ -10,10 +10,16 @@
 
 ## Next stage
 
-- [ ] Add typed domain models and validation for IPv4, CIDR, ports, and scan scope.
-- [ ] Add authorization records, safety policies, cancellation, rate, and concurrency limits.
-- [ ] Add structured logging and audit-event contracts.
+- [ ] Add structured audit-event persistence and database-ready serialization.
 - [ ] Add SQLite migrations and repositories.
+
+## Completed in the current stage
+
+- [x] Add immutable domain models and operation/severity enums.
+- [x] Add bounded IPv4/CIDR and port normalization.
+- [x] Add explicit authorization records and local-only safety policy defaults.
+- [x] Add cooperative cancellation and reusable rate limiting.
+- [x] Add unit tests for validation, policy, authorization, and worker controls.
 
 ## Planned modules
 

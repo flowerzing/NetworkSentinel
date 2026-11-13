@@ -12,6 +12,12 @@ when a stage is completed and verified.
 - Initial project architecture and development tooling.
 - Python 3.12+ packaging metadata with development commands.
 - A minimal Qt application shell and configuration check command.
+- Immutable domain models for scopes, authorizations, jobs, observations,
+  findings, and audit events.
+- Bounded IPv4/CIDR and port parsing with oversized-scope protection.
+- Explicit authorization and conservative local-only safety policies.
+- Cooperative cancellation and reusable operation rate limiting.
+- Unit tests for the dependency-free domain and safety layer.
 
 ### Not yet implemented
 

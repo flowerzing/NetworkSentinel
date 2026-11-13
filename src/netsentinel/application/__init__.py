@@ -1,1 +1,1 @@
-"""Application use cases (introduced incrementally by feature stage)."""
+"""Application use cases and safety policies."""
