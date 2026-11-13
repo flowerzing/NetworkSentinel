@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Packaging
+build/
+dist/
+*.whl
+
+# IDE and local tooling
+.vscode/
+.idea/
+*.code-workspace
+
+# NetSentinel runtime data
+.claude/
+data/*
+!data/.gitkeep
+*.db
+*.sqlite
+*.sqlite3
+reports/
+logs/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
