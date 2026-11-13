@@ -30,9 +30,10 @@ when a stage is completed and verified.
   progress events, rate limiting, job persistence, and audit events.
 - Runtime configuration for scope, port, concurrency, rate, and connection timeout
   limits.
+- Optional Nmap service/version detection with fixed arguments, XML parsing,
+  cancellation, process timeouts, output bounds, and no shell execution.
 
 ### Not yet implemented
 
 - Discovery and port-scan controls wired into the desktop UI.
-- Nmap service and version detection.
 - Network monitoring, inventory, assessments, and reports.

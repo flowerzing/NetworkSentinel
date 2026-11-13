@@ -23,3 +23,7 @@ class OperationCancelled(NetSentinelError):
 
 class CapabilityError(NetSentinelError):
     """Raised when an optional operating-system capability is unavailable."""
+
+
+class ToolExecutionError(NetSentinelError):
+    """Raised when an optional external tool exits unsuccessfully."""

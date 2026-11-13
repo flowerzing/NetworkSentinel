@@ -38,12 +38,16 @@ reconstructed from memory; their authoritative timestamps remain in Git history.
   timeout limits.
 - Added fake-probe tests for concurrency orchestration, progress, cancellation,
   authorization ordering, normalization, and persistence.
-- Verification: `pytest` — 40 passed; `ruff check .` — passed; `mypy src` — passed.
+- Implemented optional Nmap service/version detection with fixed argument vectors,
+  executable diagnostics, XML parsing, output limits, cancellation, and process
+  timeouts.
+- Added fake-process and controlled-XML tests that verify no shell execution and
+  no Nmap process start after cancellation.
+- Verification: `pytest` — 46 passed; `ruff check .` — passed; `mypy src` — passed.
 
 ## Next work
 
-- Implement the optional Nmap service/version adapter with a safe subprocess
-  boundary.
 - Add the first background worker integration for discovery and port scanning.
+- Wire authorized discovery and scan controls into the desktop UI.
 - Keep desktop controls disabled until the corresponding integration tests and
   authorization flow are complete.
