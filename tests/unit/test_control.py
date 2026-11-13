@@ -31,6 +31,7 @@ def test_rate_limiter_honors_a_cancelled_token() -> None:
         ("max_ports", 0),
         ("max_concurrency", 0),
         ("max_rate_per_second", 0),
+        ("connect_timeout_seconds", 0),
     ],
 )
 def test_safety_limits_reject_invalid_values(field: str, value: int) -> None:

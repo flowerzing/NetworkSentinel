@@ -27,6 +27,11 @@ def test_configuration_uses_environment_overrides(
     monkeypatch.setenv("NETSENTINEL_DATABASE_PATH", str(database_path))
     monkeypatch.setenv("NETSENTINEL_NMAP_PATH", "C:/Program Files/Nmap/nmap.exe")
     monkeypatch.setenv("NETSENTINEL_LOG_LEVEL", "debug")
+    monkeypatch.setenv("NETSENTINEL_MAX_SCOPE_HOSTS", "128")
+    monkeypatch.setenv("NETSENTINEL_MAX_PORTS", "512")
+    monkeypatch.setenv("NETSENTINEL_MAX_CONCURRENCY", "8")
+    monkeypatch.setenv("NETSENTINEL_MAX_RATE_PER_SECOND", "12.5")
+    monkeypatch.setenv("NETSENTINEL_CONNECT_TIMEOUT_SECONDS", "0.75")
 
     config = AppConfig.from_environment()
 
@@ -35,6 +40,11 @@ def test_configuration_uses_environment_overrides(
     assert config.database_path == database_path
     assert config.nmap_path == "C:/Program Files/Nmap/nmap.exe"
     assert config.log_level == "DEBUG"
+    assert config.max_scope_hosts == 128
+    assert config.max_ports == 512
+    assert config.max_concurrency == 8
+    assert config.max_rate_per_second == 12.5
+    assert config.connect_timeout_seconds == 0.75
 
 
 def test_configuration_rejects_unknown_log_level(monkeypatch) -> None:

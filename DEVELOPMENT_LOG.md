@@ -30,12 +30,20 @@ reconstructed from memory; their authoritative timestamps remain in Git history.
 - Added fake-adapter tests for normalization, persistence, authorization ordering,
   out-of-scope evidence, and invalid evidence.
 - Updated README, CHANGELOG, and TODO to reflect the verified capability boundary.
-- Verification: `pytest` — 34 passed; `ruff check .` — passed; `mypy src` — passed.
+- Implemented the bounded TCP Connect scanner service and socket adapter.
+- Added conservative open, closed, and filtered state mapping from `connect_ex`.
+- Added bounded worker scheduling, rate limiting, cancellation checkpoints,
+  progress events, job lifecycle persistence, and audit events.
+- Extended configuration with environment-backed port, concurrency, rate, and
+  timeout limits.
+- Added fake-probe tests for concurrency orchestration, progress, cancellation,
+  authorization ordering, normalization, and persistence.
+- Verification: `pytest` — 40 passed; `ruff check .` — passed; `mypy src` — passed.
 
 ## Next work
 
-- Implement the bounded TCP Connect scanner contract and adapter.
-- Add scanner progress, cancellation, and port-observation persistence
-  orchestration.
+- Implement the optional Nmap service/version adapter with a safe subprocess
+  boundary.
+- Add the first background worker integration for discovery and port scanning.
 - Keep desktop controls disabled until the corresponding integration tests and
   authorization flow are complete.

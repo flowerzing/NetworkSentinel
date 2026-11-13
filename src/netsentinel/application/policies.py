@@ -24,6 +24,7 @@ class SafetyLimits:
     max_ports: int = 1024
     max_concurrency: int = 16
     max_rate_per_second: float = 25.0
+    connect_timeout_seconds: float = 1.5
 
     def __post_init__(self) -> None:
         """Reject unsafe limits before they can reach an active adapter."""
@@ -35,6 +36,11 @@ class SafetyLimits:
             raise ValueError("max_concurrency must be positive")
         if not isfinite(self.max_rate_per_second) or self.max_rate_per_second <= 0:
             raise ValueError("max_rate_per_second must be finite and positive")
+        if (
+            not isfinite(self.connect_timeout_seconds)
+            or self.connect_timeout_seconds <= 0
+        ):
+            raise ValueError("connect_timeout_seconds must be finite and positive")
 
 
 @dataclass(frozen=True, slots=True)

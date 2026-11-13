@@ -5,5 +5,11 @@ from netsentinel.infrastructure.scanning.scapy_discovery import (
     ScapyDiscoveryAdapter,
     diagnose_scapy,
 )
+from netsentinel.infrastructure.scanning.tcp_scanner import TcpConnectScanner
 
-__all__ = ["ScapyCapability", "ScapyDiscoveryAdapter", "diagnose_scapy"]
+__all__ = [
+    "ScapyCapability",
+    "ScapyDiscoveryAdapter",
+    "TcpConnectScanner",
+    "diagnose_scapy",
+]

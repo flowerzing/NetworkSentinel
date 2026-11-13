@@ -26,9 +26,13 @@ when a stage is completed and verified.
   persistence orchestration, and audit events.
 - Scapy/Npcap capability diagnostics and a bounded local ARP adapter.
 - Optional discovery response-time persistence for inventory records.
+- A bounded TCP Connect scan service with port-state normalization, cancellation,
+  progress events, rate limiting, job persistence, and audit events.
+- Runtime configuration for scope, port, concurrency, rate, and connection timeout
+  limits.
 
 ### Not yet implemented
 
-- Discovery controls wired into the desktop UI.
-- TCP port scanning and Nmap service detection.
+- Discovery and port-scan controls wired into the desktop UI.
+- Nmap service and version detection.
 - Network monitoring, inventory, assessments, and reports.

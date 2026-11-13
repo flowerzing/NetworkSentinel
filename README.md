@@ -7,11 +7,11 @@ Scapy/Npcap discovery, optional Nmap service detection, and evidence-based
 reporting.
 
 > **Development status:** NetSentinel currently provides its project shell,
-> domain safety layer, SQLite persistence, and the first authorized discovery
-> service. Scapy/Npcap capability diagnostics and a bounded ARP adapter are
-> implemented as library components, but discovery controls are not yet wired
-> into the desktop UI. The current build does **not** inspect ports, capture
-> packets, or claim to implement any security assessment.
+> domain safety layer, SQLite persistence, an authorized discovery service, and
+> a bounded TCP Connect scan service. Scapy/Npcap and socket adapters are
+> implemented as library components, but discovery and scan controls are not
+> yet wired into the desktop UI. The current build does **not** run Nmap,
+> capture packets, or claim to implement any security assessment.
 
 ## Project goals
 
@@ -119,10 +119,10 @@ Start the current application shell:
 python -m netsentinel
 ```
 
-The discovery adapter is available to application code only after the
-authorization and safety-policy checks. The desktop controls for discovery and
-all other scanner modules are intentionally withheld until their respective
-integration, dependency, and test stages are complete.
+The discovery and TCP adapters are available to application code only after
+the authorization and safety-policy checks. The desktop controls for discovery,
+scanning, and all other active modules are intentionally withheld until their
+respective integration, dependency, and test stages are complete.
 
 ## Development checks
 
@@ -146,7 +146,9 @@ validated before a job starts. The current bootstrap supports these settings:
 - SQLite database location and report output directory.
 - Nmap executable path.
 - Selected network interface.
-- Timeout, retry, rate, concurrency, and maximum scope limits.
+- Timeout, rate, concurrency, maximum port, and maximum scope limits. These can
+  be overridden with the `NETSENTINEL_*` environment variables used by the
+  bootstrap configuration.
 - Logging level and retention settings.
 
 The database path can be overridden with `NETSENTINEL_DATABASE_PATH`.
