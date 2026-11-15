@@ -9,6 +9,12 @@ from pathlib import Path
 # Use sys.argv[0] or a known path instead.
 project_root = Path.cwd()
 
+# Load version info from version_info.txt
+version_file = project_root / "version_info.txt"
+
+# Icon file - use absolute path to ensure it's found
+icon_path = project_root / "assets" / "icons" / "app.ico"
+
 # Collect data files
 def collect_data_files():
     data_files = []
@@ -82,6 +88,6 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=str(project_root / "assets" / "icons" / "app.ico") if (project_root / "assets" / "icons" / "app.ico").exists() else None,
+    icon=str(icon_path) if icon_path.exists() else None,
     version=str(version_file),
 )
