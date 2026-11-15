@@ -49,9 +49,10 @@ when a stage is completed and verified.
   heuristics, unusual high ports, and high open port count.
 - Assessment findings persist with evidence links and are exportable to CSV and
   JSON with versioned envelopes.
+- A Reports module generating assessment snapshots with assets, port
+  observations, and findings; exportable to JSON, CSV, and PDF (via reportlab).
 
 ### Not yet implemented
 
-- JSON, CSV, and PDF reports for assessment snapshots.
 - Dashboard views and live monitoring charts.
 - Windows/Npcap/Nmap opt-in integration validation and packaging.

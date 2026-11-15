@@ -33,6 +33,7 @@ from netsentinel.application.inventory import InventoryService
 from netsentinel.application.monitoring import NetworkMonitorService
 from netsentinel.application.policies import SafetyLimits, SafetyPolicy
 from netsentinel.application.port_scanning import PortScanService
+from netsentinel.application.reporting import ReportService
 from netsentinel.domain.enums import OperationType
 from netsentinel.domain.errors import NetSentinelError
 from netsentinel.domain.models import AuthorizationRecord, ScanScope
@@ -46,6 +47,7 @@ from netsentinel.infrastructure.scanning.tcp_scanner import TcpConnectScanner
 from netsentinel.ui.assessment_panel import AssessmentPanel
 from netsentinel.ui.inventory_panel import InventoryPanel
 from netsentinel.ui.monitor_panel import MonitorPanel
+from netsentinel.ui.reports_panel import ReportsPanel
 from netsentinel.ui.scan_panel import ScanFormData, ScanPanel
 from netsentinel.ui.workers import Worker, WorkerManager
 
@@ -95,6 +97,7 @@ class MainWindow(QMainWindow):
         self._monitor_service = NetworkMonitorService(PsutilMonitorProvider())
         self._inventory_service = InventoryService(self._repository)
         self._assessment_service = AssessmentService(self._repository)
+        self._report_service = ReportService(self._repository)
         self._monitor_timer = QTimer(self)
         self._monitor_timer.timeout.connect(self._refresh_monitor)
         self.setWindowTitle("NetSentinel")
@@ -178,6 +181,14 @@ class MainWindow(QMainWindow):
                 assessment_panel.export_json_requested.connect(self._export_assessment_json)
                 self._assessment_panel = assessment_panel
                 page = assessment_panel
+            elif name == "Reports":
+                reports_panel = ReportsPanel()
+                reports_panel.generate_requested.connect(self._generate_report)
+                reports_panel.export_json_requested.connect(self._export_report_json)
+                reports_panel.export_csv_requested.connect(self._export_report_csv)
+                reports_panel.export_pdf_requested.connect(self._export_report_pdf)
+                self._reports_panel = reports_panel
+                page = reports_panel
             else:
                 page = self._placeholder_page(name)
             content.addWidget(page)
@@ -333,6 +344,76 @@ class MainWindow(QMainWindow):
         path, _ = QFileDialog.getSaveFileName(
             self,
             f"Export assessment as {format_name}",
+            str(self._config.report_directory / filename),
+            f"{format_name} files (*.{format_name.lower()});;All files (*)",
+        )
+        return Path(path) if path else None
+
+    def _generate_report(self) -> None:
+        """Generate an assessment snapshot."""
+        try:
+            self._current_snapshot = self._report_service.generate_snapshot(
+                operator="gui_operator"
+            )
+        except (OSError, sqlite3.Error) as exc:
+            self._reports_panel.set_status(f"Report generation failed: {exc}")
+            return
+        self._reports_panel.set_generated(
+            f"Snapshot generated: {len(self._current_snapshot.assets)} asset(s), "
+            f"{len(self._current_snapshot.observations)} observation(s), "
+            f"{len(self._current_snapshot.findings)} finding(s)."
+        )
+
+    def _export_report_json(self) -> None:
+        """Export the current snapshot as JSON."""
+        if not hasattr(self, "_current_snapshot"):
+            self._reports_panel.set_status("No snapshot generated yet.")
+            return
+        path = self._choose_report_path("JSON", "report.json")
+        if path is None:
+            return
+        try:
+            count = self._report_service.export_json(self._current_snapshot, path)
+        except (OSError, ValueError, sqlite3.Error, RuntimeError) as exc:
+            self._reports_panel.set_status(f"JSON export failed: {exc}")
+            return
+        self._reports_panel.set_status(f"Exported {count} finding(s) to {path}.")
+
+    def _export_report_csv(self) -> None:
+        """Export the current snapshot as CSV."""
+        if not hasattr(self, "_current_snapshot"):
+            self._reports_panel.set_status("No snapshot generated yet.")
+            return
+        path = self._choose_report_path("CSV", "report.csv")
+        if path is None:
+            return
+        try:
+            count = self._report_service.export_csv(self._current_snapshot, path)
+        except (OSError, ValueError, sqlite3.Error, RuntimeError) as exc:
+            self._reports_panel.set_status(f"CSV export failed: {exc}")
+            return
+        self._reports_panel.set_status(f"Exported {count} finding(s) to {path}.")
+
+    def _export_report_pdf(self) -> None:
+        """Export the current snapshot as PDF."""
+        if not hasattr(self, "_current_snapshot"):
+            self._reports_panel.set_status("No snapshot generated yet.")
+            return
+        path = self._choose_report_path("PDF", "report.pdf")
+        if path is None:
+            return
+        try:
+            count = self._report_service.export_pdf(self._current_snapshot, path)
+        except (OSError, ValueError, sqlite3.Error, RuntimeError) as exc:
+            self._reports_panel.set_status(f"PDF export failed: {exc}")
+            return
+        self._reports_panel.set_status(f"Exported {count} finding(s) to {path}.")
+
+    def _choose_report_path(self, format_name: str, filename: str) -> Path | None:
+        """Ask the operator for an export path without overwriting silently."""
+        path, _ = QFileDialog.getSaveFileName(
+            self,
+            f"Export report as {format_name}",
             str(self._config.report_directory / filename),
             f"{format_name} files (*.{format_name.lower()});;All files (*)",
         )

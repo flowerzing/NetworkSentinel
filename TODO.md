@@ -11,7 +11,6 @@
 ## Next stage
 
 - [ ] Add a dashboard summary using verified persisted results.
-- [ ] Add JSON, CSV, and PDF reports.
 - [ ] Add Windows packaging and opt-in integration tests.
 
 ## Completed in the current stage
@@ -38,6 +37,7 @@
 - [x] Add monitoring tests with fake providers and a rendered Qt snapshot.
 - [x] Add Device Inventory with search, refresh, and CSV/JSON export.
 - [x] Add evidence-based Security Assessment with deterministic rules and CSV/JSON export.
+- [x] Add Reports module with JSON, CSV, and PDF export.
 
 ## Planned modules
 
@@ -47,7 +47,7 @@
 - [x] Network Monitor using Windows-compatible interface statistics.
 - [x] Device Inventory with CSV and JSON export.
 - [x] Evidence-based Security Assessment.
-- [ ] JSON, CSV, and PDF reports.
+- [x] JSON, CSV, and PDF reports.
 - [ ] Dashboard and module-specific PySide6 views.
 - [ ] Windows packaging and opt-in integration tests.
 
