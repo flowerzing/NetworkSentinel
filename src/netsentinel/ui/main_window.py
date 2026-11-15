@@ -45,6 +45,7 @@ from netsentinel.infrastructure.monitoring.psutil_monitor import PsutilMonitorPr
 from netsentinel.infrastructure.scanning.scapy_discovery import ScapyDiscoveryAdapter
 from netsentinel.infrastructure.scanning.tcp_scanner import TcpConnectScanner
 from netsentinel.ui.assessment_panel import AssessmentPanel
+from netsentinel.ui.dashboard_panel import DashboardPanel
 from netsentinel.ui.inventory_panel import InventoryPanel
 from netsentinel.ui.monitor_panel import MonitorPanel
 from netsentinel.ui.reports_panel import ReportsPanel
@@ -142,7 +143,12 @@ class MainWindow(QMainWindow):
         content.setObjectName("content")
         for name in _NAVIGATION:
             page: QWidget
-            if name == "Network Discovery":
+            if name == "Dashboard":
+                dashboard_panel = DashboardPanel()
+                dashboard_panel.refresh_requested.connect(self._refresh_dashboard)
+                self._dashboard_panel = dashboard_panel
+                page = dashboard_panel
+            elif name == "Network Discovery":
                 panel = ScanPanel(OperationType.DISCOVERY)
                 panel.start_requested.connect(self._start_discovery)
                 panel.cancel_requested.connect(
@@ -268,6 +274,29 @@ class MainWindow(QMainWindow):
             self._inventory_panel.set_status(f"Inventory unavailable: {exc}")
             return
         self._inventory_panel.set_assets(assets, search.strip())
+        self._refresh_dashboard()
+
+    def _refresh_dashboard(self) -> None:
+        """Update dashboard with current inventory and assessment data."""
+        try:
+            assets = self._inventory_service.list_assets()
+            findings = self._assessment_service.list_findings()
+        except (OSError, sqlite3.Error) as exc:
+            self._dashboard_panel.set_status(f"Dashboard unavailable: {exc}")
+            return
+
+        # Count open ports from observations
+        try:
+            observations = self._repository.list_port_observations()
+            open_port_count = sum(1 for o in observations if o.state == "open")
+        except (OSError, sqlite3.Error):
+            open_port_count = 0
+
+        self._dashboard_panel.update_metrics(
+            device_count=len(assets),
+            open_port_count=open_port_count,
+            findings=findings,
+        )
 
     def _export_inventory_csv(self, search: str) -> None:
         """Choose a destination and export the current inventory as CSV."""

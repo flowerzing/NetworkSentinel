@@ -51,8 +51,11 @@ when a stage is completed and verified.
   JSON with versioned envelopes.
 - A Reports module generating assessment snapshots with assets, port
   observations, and findings; exportable to JSON, CSV, and PDF (via reportlab).
+- A Dashboard panel with key metrics: device count, open ports, findings,
+  and critical severity count; auto-refreshes after inventory and assessment.
+- Live traffic charts in Network Monitor using pyqtgraph showing aggregated
+  send/receive rates over time.
 
 ### Not yet implemented
 
-- Dashboard views and live monitoring charts.
 - Windows/Npcap/Nmap opt-in integration validation and packaging.

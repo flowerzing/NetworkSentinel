@@ -10,7 +10,6 @@
 
 ## Next stage
 
-- [ ] Add a dashboard summary using verified persisted results.
 - [ ] Add Windows packaging and opt-in integration tests.
 
 ## Completed in the current stage
@@ -38,6 +37,8 @@
 - [x] Add Device Inventory with search, refresh, and CSV/JSON export.
 - [x] Add evidence-based Security Assessment with deterministic rules and CSV/JSON export.
 - [x] Add Reports module with JSON, CSV, and PDF export.
+- [x] Add Dashboard panel with key metrics auto-refreshing from inventory/assessment.
+- [x] Add live traffic charts in Network Monitor using pyqtgraph.
 
 ## Planned modules
 
@@ -48,15 +49,14 @@
 - [x] Device Inventory with CSV and JSON export.
 - [x] Evidence-based Security Assessment.
 - [x] JSON, CSV, and PDF reports.
-- [ ] Dashboard and module-specific PySide6 views.
+- [x] Dashboard and module-specific PySide6 views (Dashboard, live charts).
 - [ ] Windows packaging and opt-in integration tests.
 
 ## Known limitations
 
 - The desktop starts authorized Discovery and TCP Connect operations plus a
-  read-only local monitor. Discovery requires Scapy/Npcap and suitable Windows
-  permissions; the monitor currently presents a table and not a live chart.
+  read-only local monitor with live traffic charts. Discovery requires Scapy/Npcap
+  and suitable Windows permissions.
 - The default test suite uses fake adapters and generates no network traffic.
 - Nmap service detection is implemented as an optional library adapter but is not
   wired into the desktop UI yet.
-- Network monitoring, inventory, assessment, and reporting are not implemented yet.

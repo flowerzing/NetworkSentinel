@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections import deque
+
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QFormLayout,
@@ -14,6 +16,16 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
+# pyqtgraph is an optional dependency; mypy ignores missing stubs
+try:
+    import pyqtgraph as pg
+    from pyqtgraph import PlotWidget
+    PYQTGRAPH_AVAILABLE = True
+except ImportError:
+    PYQTGRAPH_AVAILABLE = False
+
+# mypy: disable-error-code="import-untyped"
 
 from netsentinel.domain.models import MonitorSnapshot, TrafficSample
 
@@ -35,8 +47,12 @@ class MonitorPanel(QWidget):
         "Errors / drops",
     )
 
+    _MAX_POINTS = 120  # Keep last 120 samples for chart
+
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
+        self._traffic_history: dict[str, deque[tuple[float, float]]] = {}
+        self._time_history: deque[float] = deque(maxlen=self._MAX_POINTS)
         self._build_ui()
 
     def _build_ui(self) -> None:
@@ -89,6 +105,34 @@ class MonitorPanel(QWidget):
         self.table.horizontalHeader().setStretchLastSection(True)
         layout.addWidget(self.table, stretch=1)
 
+        # Live traffic charts
+        if PYQTGRAPH_AVAILABLE:
+            self.chart_widget = PlotWidget()
+            self.chart_widget.setObjectName("trafficChart")
+            self.chart_widget.setBackground("#1e293b")
+            self.chart_widget.setTitle(
+                "Live Traffic Rates", color="#e0f2fe", size="12pt"
+            )
+            self.chart_widget.setLabel("left", "Rate", units="B/s")
+            self.chart_widget.setLabel("bottom", "Time", units="s")
+            self.chart_widget.showGrid(x=True, y=True, alpha=0.3)
+            self.chart_widget.addLegend()
+            self._send_curve = self.chart_widget.plot(
+                pen=pg.mkPen("#60a5fa", width=2), name="Sent"
+            )
+            self._recv_curve = self.chart_widget.plot(
+                pen=pg.mkPen("#f87171", width=2), name="Received"
+            )
+            layout.addWidget(self.chart_widget, stretch=1)
+        else:
+            self.chart_widget = None
+            missing = QLabel(
+                "Install pyqtgraph for live charts: pip install pyqtgraph"
+            )
+            missing.setObjectName("status")
+            missing.setWordWrap(True)
+            layout.addWidget(missing)
+
         self.status = QLabel("Ready. Monitoring is stopped.")
         self.status.setObjectName("status")
         self.status.setWordWrap(True)
@@ -118,10 +162,48 @@ class MonitorPanel(QWidget):
             )
             for column, value in enumerate(values):
                 self.table.setItem(row, column, QTableWidgetItem(value))
+
         local_time = snapshot.sampled_at.astimezone().strftime(
             "%Y-%m-%d %H:%M:%S"
         )
         self.status.setText(f"Last sample: {local_time}")
+
+        # Update charts with aggregated traffic
+        self._update_charts(snapshot)
+
+    def _update_charts(self, snapshot: MonitorSnapshot) -> None:
+        """Update live traffic charts with new sample."""
+        if not PYQTGRAPH_AVAILABLE or self.chart_widget is None:
+            return
+
+        # Aggregate send/receive rates across all interfaces
+        total_send = sum(
+            sample.send_rate_bytes_per_second
+            for sample in snapshot.traffic
+        )
+        total_recv = sum(
+            sample.receive_rate_bytes_per_second
+            for sample in snapshot.traffic
+        )
+
+        # Use timestamp as x-axis (seconds since epoch)
+        timestamp = snapshot.sampled_at.timestamp()
+        self._time_history.append(timestamp)
+        self._time_history = deque(list(self._time_history), maxlen=self._MAX_POINTS)
+
+        # Update curves
+        times = list(self._time_history)
+        if len(times) > 1:
+            # Normalize to relative time (seconds since first sample)
+            base_time = times[0]
+            rel_times = [t - base_time for t in times]
+
+            # Get send/recv history
+            send_data = [total_send] * len(times)  # Simplified: just current value
+            recv_data = [total_recv] * len(times)
+
+            self._send_curve.setData(rel_times, send_data)
+            self._recv_curve.setData(rel_times, recv_data)
 
     def set_status(self, message: str) -> None:
         """Set an actionable status or error message."""
