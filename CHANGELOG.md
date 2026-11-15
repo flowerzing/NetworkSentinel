@@ -43,8 +43,15 @@ when a stage is completed and verified.
   counters, calculated byte rates, configurable timer refreshes, and a Qt table.
 - Monitoring tests using fake providers and a rendered Qt snapshot without real
   network traffic.
+- A Device Inventory panel with search, refresh, and CSV/JSON export.
+- An evidence-based Security Assessment panel with deterministic rules:
+  open ports without service info, insecure service detection, outdated version
+  heuristics, unusual high ports, and high open port count.
+- Assessment findings persist with evidence links and are exportable to CSV and
+  JSON with versioned envelopes.
 
 ### Not yet implemented
 
-- Device inventory UI and exports, assessments, reports, and dashboard views.
-- Live monitoring charts and Windows/Npcap/Nmap opt-in integration validation.
+- JSON, CSV, and PDF reports for assessment snapshots.
+- Dashboard views and live monitoring charts.
+- Windows/Npcap/Nmap opt-in integration validation and packaging.

@@ -10,8 +10,9 @@
 
 ## Next stage
 
-- [ ] Add Device Inventory browsing with CSV and JSON export.
 - [ ] Add a dashboard summary using verified persisted results.
+- [ ] Add JSON, CSV, and PDF reports.
+- [ ] Add Windows packaging and opt-in integration tests.
 
 ## Completed in the current stage
 
@@ -35,6 +36,8 @@
 - [x] Add GUI tests for panel construction, authorization gating, and fake discovery workers.
 - [x] Add psutil-based local Network Monitor with timer controls and rate calculation.
 - [x] Add monitoring tests with fake providers and a rendered Qt snapshot.
+- [x] Add Device Inventory with search, refresh, and CSV/JSON export.
+- [x] Add evidence-based Security Assessment with deterministic rules and CSV/JSON export.
 
 ## Planned modules
 
@@ -42,8 +45,8 @@
 - [x] TCP Connect port scanner with bounded concurrency and progress reporting.
 - [x] Optional Nmap service/version adapter using a safe subprocess boundary.
 - [x] Network Monitor using Windows-compatible interface statistics.
-- [ ] Device Inventory with CSV and JSON export.
-- [ ] Evidence-based Security Assessment.
+- [x] Device Inventory with CSV and JSON export.
+- [x] Evidence-based Security Assessment.
 - [ ] JSON, CSV, and PDF reports.
 - [ ] Dashboard and module-specific PySide6 views.
 - [ ] Windows packaging and opt-in integration tests.

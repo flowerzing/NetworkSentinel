@@ -1,19 +1,22 @@
-"""Qt tests for the authorized discovery, scan, and monitor controls."""
+"""Qt tests for the authorized discovery, scan, monitor, and inventory controls."""
 
 from datetime import UTC, datetime
 from ipaddress import IPv4Address
 from pathlib import Path
+from uuid import uuid4
 
 from PySide6.QtWidgets import QMessageBox
 
 from netsentinel.application.discovery import DiscoveryService
 from netsentinel.domain.models import (
+    DeviceAsset,
     DiscoveryRecord,
     InterfaceInfo,
     MonitorSnapshot,
     TrafficSample,
 )
 from netsentinel.infrastructure.config import AppConfig
+from netsentinel.ui.inventory_panel import InventoryPanel
 from netsentinel.ui.main_window import MainWindow
 from netsentinel.ui.monitor_panel import MonitorPanel
 
@@ -50,6 +53,7 @@ def test_main_window_exposes_active_operation_panels(qtbot, tmp_path: Path) -> N
     assert window._discovery_panel.start_button.isEnabled()
     assert window._port_scan_panel.start_button.isEnabled()
     assert window._monitor_panel.start_button.isEnabled()
+    assert window._inventory_panel.table.rowCount() == 0
     assert window._discovery_panel.cancel_button.isEnabled() is False
     assert window._port_scan_panel.cancel_button.isEnabled() is False
     assert window._worker_manager.active_job_ids == ()
@@ -82,6 +86,7 @@ def test_authorized_discovery_runs_in_worker_with_fake_adapter(
     assert panel.start_button.isEnabled()
     assert "completed successfully" in panel.status.text()
     assert len(window._repository.list_assets()) == 1
+    assert window._inventory_panel.table.rowCount() == 1
     assert window._repository.list_assets()[0].address == IPv4Address(
         "192.168.50.1"
     )
@@ -144,3 +149,30 @@ def test_monitor_panel_renders_a_fake_snapshot(qtbot) -> None:
     assert panel.table.rowCount() == 1
     assert panel.table.item(0, 0).text() == "Ethernet"
     assert "100.0 B/s" in panel.table.item(0, 5).text()
+
+
+def test_inventory_panel_renders_a_persisted_asset(qtbot) -> None:
+    panel = InventoryPanel()
+    qtbot.addWidget(panel)
+    timestamp = datetime(2026, 1, 1, 12, tzinfo=UTC)
+
+    panel.set_assets(
+        (
+            DeviceAsset(
+                asset_id=uuid4(),
+                address=IPv4Address("192.168.1.10"),
+                first_seen=timestamp,
+                last_seen=timestamp,
+                mac_address="AA:BB:CC:DD:EE:FF",
+                hostname="lab-host",
+                vendor="Example Vendor",
+                response_time_ms=2.5,
+                status="active",
+            ),
+        ),
+        "",
+    )
+
+    assert panel.table.rowCount() == 1
+    assert panel.table.item(0, 0).text() == "192.168.1.10"
+    assert panel.table.item(0, 2).text() == "lab-host"

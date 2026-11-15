@@ -12,6 +12,7 @@ from uuid import UUID, uuid4
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import (
+    QFileDialog,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -24,9 +25,11 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from netsentinel.application.assessment import AssessmentService
 from netsentinel.application.authorization import AuthorizationService
 from netsentinel.application.discovery import DiscoveryService
 from netsentinel.application.events import JobErrorEvent, ProgressEvent
+from netsentinel.application.inventory import InventoryService
 from netsentinel.application.monitoring import NetworkMonitorService
 from netsentinel.application.policies import SafetyLimits, SafetyPolicy
 from netsentinel.application.port_scanning import PortScanService
@@ -40,6 +43,8 @@ from netsentinel.infrastructure.database.repositories import SQLiteRepository
 from netsentinel.infrastructure.monitoring.psutil_monitor import PsutilMonitorProvider
 from netsentinel.infrastructure.scanning.scapy_discovery import ScapyDiscoveryAdapter
 from netsentinel.infrastructure.scanning.tcp_scanner import TcpConnectScanner
+from netsentinel.ui.assessment_panel import AssessmentPanel
+from netsentinel.ui.inventory_panel import InventoryPanel
 from netsentinel.ui.monitor_panel import MonitorPanel
 from netsentinel.ui.scan_panel import ScanFormData, ScanPanel
 from netsentinel.ui.workers import Worker, WorkerManager
@@ -88,6 +93,8 @@ class MainWindow(QMainWindow):
             self._repository,
         )
         self._monitor_service = NetworkMonitorService(PsutilMonitorProvider())
+        self._inventory_service = InventoryService(self._repository)
+        self._assessment_service = AssessmentService(self._repository)
         self._monitor_timer = QTimer(self)
         self._monitor_timer.timeout.connect(self._refresh_monitor)
         self.setWindowTitle("NetSentinel")
@@ -155,10 +162,27 @@ class MainWindow(QMainWindow):
                 monitor_panel.refresh_requested.connect(self._refresh_monitor)
                 self._monitor_panel = monitor_panel
                 page = monitor_panel
+            elif name == "Device Inventory":
+                inventory_panel = InventoryPanel()
+                inventory_panel.refresh_requested.connect(self._refresh_inventory)
+                inventory_panel.export_csv_requested.connect(self._export_inventory_csv)
+                inventory_panel.export_json_requested.connect(
+                    self._export_inventory_json
+                )
+                self._inventory_panel = inventory_panel
+                page = inventory_panel
+            elif name == "Security Assessment":
+                assessment_panel = AssessmentPanel()
+                assessment_panel.assess_requested.connect(self._run_assessment)
+                assessment_panel.export_csv_requested.connect(self._export_assessment_csv)
+                assessment_panel.export_json_requested.connect(self._export_assessment_json)
+                self._assessment_panel = assessment_panel
+                page = assessment_panel
             else:
                 page = self._placeholder_page(name)
             content.addWidget(page)
         self._content = content
+        self._refresh_inventory("")
 
         layout.addWidget(sidebar)
         layout.addWidget(content, stretch=1)
@@ -224,6 +248,95 @@ class MainWindow(QMainWindow):
             self._monitor_panel.set_status(f"Monitoring unavailable: {exc}")
             return
         self._monitor_panel.set_snapshot(snapshot)
+
+    def _refresh_inventory(self, search: str) -> None:
+        """Load persisted assets into the inventory table."""
+        try:
+            assets = self._inventory_service.list_assets(search)
+        except (OSError, sqlite3.Error) as exc:
+            self._inventory_panel.set_status(f"Inventory unavailable: {exc}")
+            return
+        self._inventory_panel.set_assets(assets, search.strip())
+
+    def _export_inventory_csv(self, search: str) -> None:
+        """Choose a destination and export the current inventory as CSV."""
+        path = self._choose_inventory_path("CSV", "inventory.csv")
+        if path is None:
+            return
+        try:
+            count = self._inventory_service.export_csv(path, search)
+        except (OSError, ValueError, sqlite3.Error) as exc:
+            self._inventory_panel.set_status(f"CSV export failed: {exc}")
+            return
+        self._inventory_panel.set_status(f"Exported {count} device(s) to {path}.")
+
+    def _export_inventory_json(self, search: str) -> None:
+        """Choose a destination and export the current inventory as JSON."""
+        path = self._choose_inventory_path("JSON", "inventory.json")
+        if path is None:
+            return
+        try:
+            count = self._inventory_service.export_json(path, search)
+        except (OSError, ValueError, sqlite3.Error) as exc:
+            self._inventory_panel.set_status(f"JSON export failed: {exc}")
+            return
+        self._inventory_panel.set_status(f"Exported {count} device(s) to {path}.")
+
+    def _choose_inventory_path(self, format_name: str, filename: str) -> Path | None:
+        """Ask the operator for an export path without overwriting silently."""
+        path, _ = QFileDialog.getSaveFileName(
+            self,
+            f"Export inventory as {format_name}",
+            str(self._config.report_directory / filename),
+            f"{format_name} files (*.{format_name.lower()});;All files (*)",
+        )
+        return Path(path) if path else None
+
+    def _run_assessment(self) -> None:
+        """Run deterministic assessment rules against current evidence."""
+        try:
+            findings = self._assessment_service.assess()
+        except (OSError, sqlite3.Error) as exc:
+            self._assessment_panel.set_status(f"Assessment failed: {exc}")
+            return
+        self._assessment_panel.set_findings(findings)
+        self._assessment_panel.set_status(
+            f"Assessment completed. {len(findings)} finding(s) generated."
+        )
+
+    def _export_assessment_csv(self) -> None:
+        """Choose a destination and export the current assessment as CSV."""
+        path = self._choose_assessment_path("CSV", "assessment.csv")
+        if path is None:
+            return
+        try:
+            count = self._assessment_service.export_csv(path)
+        except (OSError, ValueError, sqlite3.Error) as exc:
+            self._assessment_panel.set_status(f"CSV export failed: {exc}")
+            return
+        self._assessment_panel.set_status(f"Exported {count} finding(s) to {path}.")
+
+    def _export_assessment_json(self) -> None:
+        """Choose a destination and export the current assessment as JSON."""
+        path = self._choose_assessment_path("JSON", "assessment.json")
+        if path is None:
+            return
+        try:
+            count = self._assessment_service.export_json(path)
+        except (OSError, ValueError, sqlite3.Error) as exc:
+            self._assessment_panel.set_status(f"JSON export failed: {exc}")
+            return
+        self._assessment_panel.set_status(f"Exported {count} finding(s) to {path}.")
+
+    def _choose_assessment_path(self, format_name: str, filename: str) -> Path | None:
+        """Ask the operator for an export path without overwriting silently."""
+        path, _ = QFileDialog.getSaveFileName(
+            self,
+            f"Export assessment as {format_name}",
+            str(self._config.report_directory / filename),
+            f"{format_name} files (*.{format_name.lower()});;All files (*)",
+        )
+        return Path(path) if path else None
 
     def _start_operation(
         self,
@@ -385,6 +498,8 @@ class MainWindow(QMainWindow):
         panel.progress.setRange(0, 1)
         panel.progress.setValue(1)
         panel.set_status(f"Operation completed successfully. Results: {count}.")
+        if panel is self._discovery_panel:
+            self._refresh_inventory(self._inventory_panel.search.text().strip())
 
     def _on_error(self, panel: ScanPanel, event: object) -> None:
         if isinstance(event, JobErrorEvent):
