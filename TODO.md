@@ -10,7 +10,7 @@
 
 ## Next stage
 
-- [ ] Add Windows packaging and opt-in integration tests.
+- [x] Add Windows packaging and opt-in integration tests.
 
 ## Completed in the current stage
 
@@ -39,6 +39,7 @@
 - [x] Add Reports module with JSON, CSV, and PDF export.
 - [x] Add Dashboard panel with key metrics auto-refreshing from inventory/assessment.
 - [x] Add live traffic charts in Network Monitor using pyqtgraph.
+- [x] Add Windows packaging with PyInstaller (single-file GUI executable, ~76 MB).
 
 ## Planned modules
 
@@ -50,7 +51,7 @@
 - [x] Evidence-based Security Assessment.
 - [x] JSON, CSV, and PDF reports.
 - [x] Dashboard and module-specific PySide6 views (Dashboard, live charts).
-- [ ] Windows packaging and opt-in integration tests.
+- [x] Windows packaging with PyInstaller (single-file GUI executable, ~76 MB).
 
 ## Known limitations
 

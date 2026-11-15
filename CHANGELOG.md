@@ -55,7 +55,8 @@ when a stage is completed and verified.
   and critical severity count; auto-refreshes after inventory and assessment.
 - Live traffic charts in Network Monitor using pyqtgraph showing aggregated
   send/receive rates over time.
+- Windows packaging with PyInstaller producing a single-file GUI executable (~76 MB) with all dependencies bundled.
 
 ### Not yet implemented
 
-- Windows/Npcap/Nmap opt-in integration validation and packaging.
+- Opt-in integration tests for Windows/Npcap/Nmap (marked for manual validation).
