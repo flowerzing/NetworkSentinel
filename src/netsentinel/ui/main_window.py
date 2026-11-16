@@ -50,6 +50,7 @@ from netsentinel.ui.inventory_panel import InventoryPanel
 from netsentinel.ui.monitor_panel import MonitorPanel
 from netsentinel.ui.reports_panel import ReportsPanel
 from netsentinel.ui.scan_panel import ScanFormData, ScanPanel
+from netsentinel.ui.settings_panel import SettingsPanel
 from netsentinel.ui.workers import Worker, WorkerManager
 
 _NAVIGATION = (
@@ -195,6 +196,13 @@ class MainWindow(QMainWindow):
                 reports_panel.export_pdf_requested.connect(self._export_report_pdf)
                 self._reports_panel = reports_panel
                 page = reports_panel
+            elif name == "Settings":
+                settings_panel = SettingsPanel()
+                settings_panel.settings_changed.connect(self._on_settings_changed)
+                self._settings_panel = settings_panel
+                page = settings_panel
+            elif name == "About":
+                page = self._about_page()
             else:
                 page = self._placeholder_page(name)
             content.addWidget(page)
@@ -629,6 +637,60 @@ class MainWindow(QMainWindow):
                 if self._worker_manager.cancel(job_id):
                     panel.set_status("Cancellation requested…")
                 return
+
+    def _on_settings_changed(self) -> None:
+        """Handle settings changes - could reload config or notify services."""
+        # Settings are saved to QSettings; services would need restart to pick up
+        # For now, just inform the user
+        self._settings_panel.status.setText("Settings saved. Restart app to apply all changes.")
+
+    def _about_page(self) -> QWidget:
+        """Build the About page."""
+        page = QWidget()
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(42, 42, 42, 42)
+        layout.setSpacing(16)
+
+        title = QLabel("NetSentinel")
+        title.setStyleSheet("font-size: 28px; font-weight: 700; color: #e0f2fe;")
+        subtitle = QLabel("Defensive Network Visibility")
+        subtitle.setStyleSheet("font-size: 14px; color: #93c5fd;")
+        version = QLabel("Version 1.0.0")
+        version.setStyleSheet("color: #94a3b8;")
+
+        desc = QLabel(
+            "A Windows-first defensive network auditing desktop application. "
+            "Built with Python 3.12+, PySide6, SQLite, Scapy/Npcap, and optional Nmap.\n\n"
+            "Modules:\n"
+            "• Network Discovery (ARP)\n"
+            "• TCP Connect Port Scanner\n"
+            "• Local Network Monitor (psutil)\n"
+            "• Device Inventory\n"
+            "• Evidence-based Security Assessment\n"
+            "• Reports (JSON, CSV, PDF)\n\n"
+            "Security: Authorized targets only. No exploitation, brute force, or DoS."
+        )
+        desc.setWordWrap(True)
+        desc.setObjectName("status")
+        desc.setMaximumWidth(720)
+
+        links = QLabel(
+            '<a href="https://github.com/INGFLWRZ/NetSentinel">GitHub Repository</a> | '
+            '<a href="https://npcap.com/">Npcap</a> | '
+            '<a href="https://nmap.org/">Nmap</a>'
+        )
+        links.setOpenExternalLinks(True)
+        links.setStyleSheet("color: #60a5fa;")
+
+        layout.addWidget(title)
+        layout.addWidget(subtitle)
+        layout.addWidget(version)
+        layout.addSpacing(16)
+        layout.addWidget(desc)
+        layout.addSpacing(24)
+        layout.addWidget(links)
+        layout.addStretch(1)
+        return page
 
     def _show_page(self, index: int) -> None:
         self._content.setCurrentIndex(index)
